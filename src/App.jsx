@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import StickyNote from './StickyNote.jsx';
 import ThreedButton from './ThreedButton.jsx';
-
-const NOTE_SIZE = 320;
+import { TOUCH_QUERY, useMediaQuery, useViewportWidth } from './useResponsive.js';
 
 const COLOR_KEYS = ['blue', 'green', 'lavender', 'grey', 'yellow', 'red'];
 
@@ -23,6 +22,11 @@ export default function App() {
   // bump key to fully remount the note so it animates back on from "rest"
   const [resetKey, setResetKey] = useState(0);
 
+  const isTouch = useMediaQuery(TOUCH_QUERY);
+  const vw = useViewportWidth();
+  // Scale the note down to fit small screens (leave room for page padding).
+  const noteSize = Math.round(Math.max(210, Math.min(320, vw - 56)));
+
   const stickBack = () => {
     setPeeled(false);
     setResetKey((k) => k + 1);
@@ -35,7 +39,7 @@ export default function App() {
 
   return (
     <div
-      className="relative min-h-screen w-full flex flex-col items-center justify-center gap-10 p-8 text-stone-700"
+      className="relative min-h-screen w-full flex flex-col items-center justify-center gap-6 sm:gap-10 p-4 sm:p-8 text-stone-700 overflow-hidden"
       style={{
         backgroundColor: '#efece4',
         // Diagonal micro pattern ("Gradient 3") across the entire page
@@ -45,25 +49,27 @@ export default function App() {
         backgroundAttachment: 'fixed',
       }}
     >
-      <div className="text-center">
+      <div className="text-center px-2">
         <h1
-          className="text-5xl tracking-tight text-stone-800"
+          className="text-4xl sm:text-5xl tracking-tight text-stone-800"
           style={{ fontFamily: '"Tanker", sans-serif' }}
         >
           Sticky Note
         </h1>
         <p
-          className="mt-3 text-stone-500"
+          className="mt-3 text-sm sm:text-base text-stone-500"
           style={{ fontFamily: '"Outfit", sans-serif' }}
         >
-          Hover to lift the corner, click to peel it off the wall.
+          {isTouch
+            ? 'Tap to fold the corner, swipe to peel it off the wall.'
+            : 'Hover to lift the corner, click to peel it off the wall.'}
         </p>
       </div>
 
       {/* Stage: residue mark + the sticky note */}
       <div
         className="relative"
-        style={{ width: NOTE_SIZE, height: NOTE_SIZE }}
+        style={{ width: noteSize, height: noteSize }}
       >
         {/* Adhesive residue / shadow left behind after peeling */}
         <div
@@ -88,12 +94,12 @@ export default function App() {
 
         <StickyNote
           key={resetKey}
-          size={NOTE_SIZE}
+          size={noteSize}
           color={color}
           peeled={peeled}
           onPeelChange={setPeeled}
           text="peel me"
-          subtext="click & watch it lift"
+          subtext={isTouch ? 'tap, then swipe away' : 'click & watch it lift'}
         />
       </div>
 

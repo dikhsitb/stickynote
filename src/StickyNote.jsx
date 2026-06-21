@@ -1,18 +1,30 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'motion/react';
+import { TOUCH_QUERY, useMediaQuery } from './useResponsive.js';
 
 /**
  * StickyNote
  *
- * A real-life sticky-note peeling interaction:
+ * A real-life sticky-note peeling interaction.
+ *
+ * Desktop (mouse / hover):
  *  - Hover  -> the bottom-right corner folds up (page-curl), casting a soft shadow.
  *  - Click  -> the whole note peels off the wall, curling and falling away.
+ *
+ * Mobile (touch, no hover):
+ *  - Tap    -> toggles the corner fold up / down.
+ *  - Swipe  -> peels the whole note off the wall.
+ *
  *  - Reset  -> the note sticks itself back on.
  *
  * Geometry is authored in a 0..200 viewBox and rendered at `size` px.
  * The full + folded paths share an identical command list so motion can
  * smoothly morph between them.
  */
+
+// Pointer-gesture thresholds (px) used on touch devices.
+const TAP_MAX = 12; // movement at or below this counts as a tap
+const SWIPE_MIN = 45; // movement at or above this counts as a swipe
 
 // Rounded square (resting state). Bottom-right corner is rounded.
 const PATH_FLAT = `
@@ -76,10 +88,16 @@ const StickyNote = ({
 }) => {
   const [internalPeeled, setInternalPeeled] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [isFolded, setIsFolded] = useState(false); // tap-toggled fold (touch)
+  const pointerStart = useRef(null);
+
+  const isTouch = useMediaQuery(TOUCH_QUERY);
 
   const isPeeled =
     controlledPeeled !== undefined ? controlledPeeled : internalPeeled;
-  const variant = isPeeled ? 'peeled' : isHovered ? 'hover' : 'rest';
+  // On desktop the fold is driven by hover; on touch it's the tap-toggle.
+  const isFoldedNow = isHovered || isFolded;
+  const variant = isPeeled ? 'peeled' : isFoldedNow ? 'hover' : 'rest';
 
   const peel = () => {
     if (isPeeled) return;
@@ -93,6 +111,45 @@ const StickyNote = ({
       peel();
     }
   };
+
+  // --- Touch gestures: tap folds, swipe peels ---
+  const handlePointerDown = (e) => {
+    if (isPeeled) return;
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    pointerStart.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerUp = (e) => {
+    const start = pointerStart.current;
+    pointerStart.current = null;
+    if (!start || isPeeled) return;
+    const dist = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+    if (dist >= SWIPE_MIN) {
+      peel(); // swipe -> peel off
+    } else if (dist <= TAP_MAX) {
+      setIsFolded((f) => !f); // tap -> toggle fold
+    }
+  };
+
+  const handlePointerCancel = () => {
+    pointerStart.current = null;
+  };
+
+  const interactionProps = isTouch
+    ? {
+        onPointerDown: handlePointerDown,
+        onPointerUp: handlePointerUp,
+        onPointerCancel: handlePointerCancel,
+      }
+    : {
+        onClick: peel,
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => setIsHovered(false),
+      };
 
   const palette = COLORS[color] ?? COLORS.yellow;
 
@@ -203,18 +260,19 @@ const StickyNote = ({
     <div
       role="button"
       aria-pressed={isPeeled}
-      aria-label={`Sticky note: ${text}. Click to peel off.`}
+      aria-label={`Sticky note: ${text}. ${
+        isTouch ? 'Tap to fold, swipe to peel off.' : 'Click to peel off.'
+      }`}
       tabIndex={0}
-      onClick={peel}
       onKeyDown={handleKeyDown}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      {...interactionProps}
       className={`relative outline-none ${className}`}
       style={{
         width: size,
         height: size,
         cursor: isPeeled ? 'default' : 'pointer',
         WebkitTapHighlightColor: 'transparent',
+        touchAction: isTouch && !isPeeled ? 'none' : 'auto',
         ...style,
       }}
     >
