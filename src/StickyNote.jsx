@@ -5,7 +5,7 @@ import { motion } from 'motion/react';
  * StickyNote
  *
  * A real-life sticky-note peeling interaction:
- *  - Hover  -> the top-right corner folds up (page-curl), casting a soft shadow.
+ *  - Hover  -> the bottom-right corner folds up (page-curl), casting a soft shadow.
  *  - Click  -> the whole note peels off the wall, curling and falling away.
  *  - Reset  -> the note sticks itself back on.
  *
@@ -14,53 +14,53 @@ import { motion } from 'motion/react';
  * smoothly morph between them.
  */
 
-// Rounded square (resting state). Top-right corner is rounded.
+// Rounded square (resting state). Bottom-right corner is rounded.
 const PATH_FLAT = `
-  M 8 0
-  L 100 0
-  L 192 0
-  C 195.3 0 200 4.7 200 8
-  L 200 64
-  L 200 192 A 8 8 0 0 1 192 200
-  L 8 200 A 8 8 0 0 1 0 192
-  L 0 8 A 8 8 0 0 1 8 0 Z
+  M 8 200
+  L 100 200
+  L 192 200
+  C 195.3 200 200 195.3 200 192
+  L 200 136
+  L 200 8 A 8 8 0 0 0 192 0
+  L 8 0 A 8 8 0 0 0 0 8
+  L 0 192 A 8 8 0 0 0 8 200 Z
 `;
 
-// Same command list, but the top-right corner is sliced diagonally (folded).
+// Same command list, but the bottom-right corner is sliced diagonally (folded).
 const PATH_FOLDED = `
-  M 8 0
-  L 100 0
-  L 144 0
-  C 160 16 180 36 200 56
-  L 200 64
-  L 200 192 A 8 8 0 0 1 192 200
-  L 8 200 A 8 8 0 0 1 0 192
-  L 0 8 A 8 8 0 0 1 8 0 Z
+  M 8 200
+  L 100 200
+  L 144 200
+  C 160 184 180 164 200 144
+  L 200 136
+  L 200 8 A 8 8 0 0 0 192 0
+  L 8 0 A 8 8 0 0 0 0 8
+  L 0 192 A 8 8 0 0 0 8 200 Z
 `;
 
 // The folded-over flap (back of the paper). Both states share an identical
-// command list AND a fixed hinge edge (the crease, `C ... 144 0`) so motion
+// command list AND a fixed hinge edge (the crease, `C ... 144 200`) so motion
 // pivots the flap about the crease like real paper:
-//   FLAT   -> the un-folded corner triangle, tip at the real corner (200,0)
-//   FOLDED -> reflected across the crease, tip flopped over to bottom-left
+//   FLAT   -> the un-folded corner triangle, tip at the real corner (200,200)
+//   FOLDED -> reflected across the crease, tip flopped over to top-left
 // Because the two free vertices are mirror images across the crease, the flap
 // passes through a zero-area "edge-on" pose at the mid-point of the morph —
 // exactly how a corner looks when lifted to 90deg before flopping over.
 const PATH_EAR_FLAT = `
-  M 144 0
-  L 188 0
-  Q 200 0 200 12
-  L 200 56
-  C 180 36 160 16 144 0
+  M 144 200
+  L 188 200
+  Q 200 200 200 188
+  L 200 144
+  C 180 164 160 184 144 200
   Z
 `;
 
 const PATH_EAR_FOLDED = `
-  M 144 0
-  L 144 44
-  Q 144 56 156 56
-  L 200 56
-  C 180 36 160 16 144 0
+  M 144 200
+  L 144 156
+  Q 144 144 156 144
+  L 200 144
+  C 180 164 160 184 144 200
   Z
 `;
 
@@ -243,7 +243,7 @@ const StickyNote = ({
               <stop offset="0%" stopColor={palette.top} />
               <stop offset="100%" stopColor={palette.bottom} />
             </linearGradient>
-            <linearGradient id={`back-${gid}`} x1="1" y1="0" x2="0" y2="1">
+            <linearGradient id={`back-${gid}`} x1="1" y1="1" x2="0" y2="0">
               <stop offset="0%" stopColor={palette.backDark} />
               <stop offset="55%" stopColor={palette.back} />
               <stop offset="100%" stopColor={palette.backLight} />
@@ -252,7 +252,7 @@ const StickyNote = ({
 
           {/* Main paper sheet */}
           <motion.path
-            fill={`url(#paper-${gid})`}
+            fill={palette.bottom}
             variants={sheetVariants}
             initial="rest"
             animate={variant}
@@ -268,7 +268,7 @@ const StickyNote = ({
             variants={earVariants}
             initial="rest"
             animate={variant}
-            style={{ filter: 'drop-shadow(-2.5px 3px 2.5px rgba(0,0,0,0.28))' }}
+            style={{ filter: 'drop-shadow(-2.5px -3px 2.5px rgba(0,0,0,0.28))' }}
           />
         </svg>
 
@@ -313,41 +313,59 @@ const StickyNote = ({
 };
 
 const COLORS = {
-  yellow: {
-    top: '#FFF59D',
-    bottom: '#FFE249',
-    back: '#F2D54A',
-    backDark: '#E7C53A',
-    backLight: '#FBEEA0',
-    crease: '#D9B73A',
-    ink: '#5A4A12',
-  },
-  pink: {
-    top: '#FFC9DD',
-    bottom: '#FF9BC0',
-    back: '#F58FB3',
-    backDark: '#E97AA1',
-    backLight: '#FFD7E6',
-    crease: '#DB6E96',
-    ink: '#7A2B4A',
-  },
   blue: {
-    top: '#BFE3FF',
-    bottom: '#82C5FF',
-    back: '#74B8F2',
-    backDark: '#5FA6E5',
-    backLight: '#D5EEFF',
+    top: '#BFE6FF',
+    bottom: '#80CAFF',
+    back: '#6FB8F0',
+    backDark: '#5AA6E2',
+    backLight: '#D6EEFF',
     crease: '#4F95D6',
     ink: '#1E466E',
   },
   green: {
-    top: '#CDF5C2',
-    bottom: '#92E27E',
-    back: '#84D46F',
-    backDark: '#6FC65A',
-    backLight: '#DDF7D4',
-    crease: '#5FB44C',
-    ink: '#234D18',
+    top: '#C2F2D2',
+    bottom: '#85E0A3',
+    back: '#74D192',
+    backDark: '#5FC07E',
+    backLight: '#DAF7E3',
+    crease: '#4FB06A',
+    ink: '#1E5132',
+  },
+  lavender: {
+    top: '#ECDDFF',
+    bottom: '#D9B8FF',
+    back: '#C8A3F2',
+    backDark: '#B68EE5',
+    backLight: '#F0E6FF',
+    crease: '#9E76D6',
+    ink: '#4A2E73',
+  },
+  grey: {
+    top: '#F4F4F4',
+    bottom: '#E6E6E6',
+    back: '#D6D6D6',
+    backDark: '#C4C4C4',
+    backLight: '#F0F0F0',
+    crease: '#ABABAB',
+    ink: '#4A4A4A',
+  },
+  yellow: {
+    top: '#FFEEA8',
+    bottom: '#FBD767',
+    back: '#EFC851',
+    backDark: '#E2B93E',
+    backLight: '#FFF1B8',
+    crease: '#CFA52F',
+    ink: '#5A4A12',
+  },
+  red: {
+    top: '#FFD2CB',
+    bottom: '#FFAFA3',
+    back: '#F59C8F',
+    backDark: '#E8897B',
+    backLight: '#FFE0DA',
+    crease: '#D66E5E',
+    ink: '#7A2E22',
   },
 };
 

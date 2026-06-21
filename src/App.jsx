@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import StickyNote from './StickyNote.jsx';
 
-const NOTE_SIZE = 230;
+const NOTE_SIZE = 320;
 
 export default function App() {
   const [peeled, setPeeled] = useState(false);
@@ -76,7 +76,7 @@ export default function App() {
       {/* Controls */}
       <div className="flex flex-col items-center gap-5">
         <div className="flex items-center gap-3">
-          {['yellow', 'pink', 'blue', 'green'].map((c) => (
+          {['blue', 'green', 'lavender', 'grey', 'yellow', 'red'].map((c) => (
             <button
               key={c}
               onClick={() => setColor(c)}
@@ -112,8 +112,10 @@ export default function App() {
 }
 
 const SWATCH = {
-  yellow: '#FFE249',
-  pink: '#FF9BC0',
-  blue: '#82C5FF',
-  green: '#92E27E',
+  blue: '#80CAFF',
+  green: '#85E0A3',
+  lavender: '#D9B8FF',
+  grey: '#E6E6E6',
+  yellow: '#FBD767',
+  red: '#FFAFA3',
 };
