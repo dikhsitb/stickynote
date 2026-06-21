@@ -1,6 +1,19 @@
 # Peeling Sticky Note
 
-An interactive sticky note you can peel off the wall. Hover to lift the corner, click to peel it away, then stick a fresh one back in a random color.
+An interactive sticky note you can peel off the wall, then stick a fresh one back in a random color. It adapts to the input device: hover + click on desktop, tap + swipe on touch screens.
+
+## Behavior
+
+The interaction model depends on whether the device can hover (detected via the `(hover: none) and (pointer: coarse)` media query):
+
+| Action       | Desktop (mouse / hover) | Mobile (touch)              |
+| ------------ | ----------------------- | --------------------------- |
+| Fold corner  | **Hover** over the note | **Tap** (toggles up / down) |
+| Peel off     | **Click**               | **Swipe**                   |
+| Stick a new one | Press **Stick another one** | Press **Stick another one** |
+
+- The note is also keyboard accessible: it's a focusable `button`, and <kbd>Enter</kbd> / <kbd>Space</kbd> peels it off.
+- The layout is responsive — the note scales to the viewport, and the heading, padding, spacing, and helper copy adapt on small screens.
 
 ## How the animation works
 
@@ -12,6 +25,19 @@ The whole note is a single SVG drawn in a `0..200` viewBox and rendered at any `
 - **Stick another one.** On reset the note remounts and animates in from an `incoming` pose that is a point-reflection of the peel exit, so it swings in **from the top** and settles onto the wall — a mirror of the peel-away.
 
 Performance note: the cast shadow is a static pre-blurred layer whose opacity/scale are tweened, rather than an expensive per-frame CSS `filter`.
+
+## How the input handling works
+
+Device capability is detected with a small `useMediaQuery` hook (`src/useResponsive.js`) using `(hover: none) and (pointer: coarse)`. The component swaps its event handlers based on the result:
+
+- **Desktop** uses `onClick` (peel) plus `onMouseEnter` / `onMouseLeave` (hover-fold).
+- **Touch** uses pointer events. On `pointerup` the gesture is classified by how far the pointer moved from `pointerdown`:
+  - movement ≤ `12px` → **tap**, which toggles an `isFolded` state (fold up / down),
+  - movement ≥ `45px` → **swipe**, which peels the note off.
+
+  The element captures the pointer (`setPointerCapture`) so the gesture keeps tracking even if the finger drifts off the note, and it sets `touch-action: none` so a swipe isn't consumed by page scrolling.
+
+The fold is driven by `isHovered || isFolded`, so the same visual state is reached whether the corner was lifted by hovering (desktop) or tapping (mobile). Responsive sizing comes from a `useViewportWidth` hook that scales the note to fit small screens, with Tailwind breakpoints (`sm:`) tuning the heading, padding, and spacing.
 
 ## Tech stack
 
