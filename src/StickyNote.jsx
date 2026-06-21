@@ -102,13 +102,22 @@ const StickyNote = ({
   // opacity/scale we tween, instead of an expensive per-frame `filter`.
 
   const wrapperVariants = {
+    // Entrance pose: a point-reflection of the peel-away, so the note swings
+    // in from the *top* and settles onto the wall (mirrors the peel exit).
+    incoming: {
+      x: size * 0.5,
+      y: -size * 0.62,
+      rotate: 78,
+      scale: 0.84,
+      opacity: 0,
+    },
     rest: {
       x: 0,
       y: 0,
       rotate: 0,
       scale: 1,
       opacity: 1,
-      transition: { duration: 0.25, ease: 'easeOut' },
+      transition: { duration: 0.55, ease: [0.4, 0, 0.2, 1] },
     },
     hover: {
       x: 0,
@@ -129,11 +138,16 @@ const StickyNote = ({
   };
 
   const shadowVariants = {
+    incoming: {
+      opacity: 0,
+      y: -10,
+      scale: 0.9,
+    },
     rest: {
       opacity: 0.45,
       y: 6,
       scale: 0.97,
-      transition: { duration: 0.25, ease: 'easeOut' },
+      transition: { duration: 0.45, ease: 'easeOut', delay: 0.1 },
     },
     hover: {
       opacity: 0.55,
@@ -216,7 +230,7 @@ const StickyNote = ({
           willChange: 'transform, opacity',
         }}
         variants={shadowVariants}
-        initial="rest"
+        initial="incoming"
         animate={variant}
       />
 
@@ -228,7 +242,7 @@ const StickyNote = ({
           willChange: 'transform, opacity',
         }}
         variants={wrapperVariants}
-        initial="rest"
+        initial="incoming"
         animate={variant}
       >
         <svg

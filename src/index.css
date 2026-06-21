@@ -1,8 +1,43 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Tanker";
+  src:
+    url("/fonts/Tanker-Regular.woff2") format("woff2"),
+    url("/fonts/Tanker-Regular.woff") format("woff"),
+    url("/fonts/Tanker-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bespoke Serif";
+  src:
+    url("/fonts/BespokeSerif-Regular.woff2") format("woff2"),
+    url("/fonts/BespokeSerif-Regular.woff") format("woff"),
+    url("/fonts/BespokeSerif-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Bespoke Serif";
+  src:
+    url("/fonts/BespokeSerif-Medium.woff2") format("woff2"),
+    url("/fonts/BespokeSerif-Medium.woff") format("woff"),
+    url("/fonts/BespokeSerif-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-background: #f5f3ee;
   --color-muted-foreground: #78716c;
+  --font-tanker: "Tanker", sans-serif;
+  --font-bespoke: "Bespoke Serif", serif;
 }
 
 :root {

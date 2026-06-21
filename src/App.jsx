@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import StickyNote from './StickyNote.jsx';
+import ThreedButton from './ThreedButton.jsx';
 
 const NOTE_SIZE = 320;
+
+const COLOR_KEYS = ['blue', 'green', 'lavender', 'grey', 'yellow', 'red'];
+
+// Pair each note color with a matching 3D-button variant
+const NOTE_TO_BUTTON = {
+  blue: 'sky',
+  green: 'emerald',
+  lavender: 'violet',
+  grey: 'slate',
+  yellow: 'amber',
+  red: 'rose',
+};
 
 export default function App() {
   const [peeled, setPeeled] = useState(false);
@@ -13,6 +26,11 @@ export default function App() {
   const stickBack = () => {
     setPeeled(false);
     setResetKey((k) => k + 1);
+    // Pick a fresh random color (different from the current one)
+    setColor((current) => {
+      const others = COLOR_KEYS.filter((c) => c !== current);
+      return others[Math.floor(Math.random() * others.length)];
+    });
   };
 
   return (
@@ -28,10 +46,16 @@ export default function App() {
       }}
     >
       <div className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-stone-800">
+        <h1
+          className="text-5xl tracking-tight text-stone-800"
+          style={{ fontFamily: '"Tanker", sans-serif' }}
+        >
           Sticky Note
         </h1>
-        <p className="mt-2 text-stone-500">
+        <p
+          className="mt-3 text-stone-500"
+          style={{ fontFamily: '"Outfit", sans-serif' }}
+        >
           Hover to lift the corner, click to peel it off the wall.
         </p>
       </div>
@@ -76,7 +100,7 @@ export default function App() {
       {/* Controls */}
       <div className="flex flex-col items-center gap-5">
         <div className="flex items-center gap-3">
-          {['blue', 'green', 'lavender', 'grey', 'yellow', 'red'].map((c) => (
+          {COLOR_KEYS.map((c) => (
             <button
               key={c}
               onClick={() => setColor(c)}
@@ -91,18 +115,21 @@ export default function App() {
           ))}
         </div>
 
-        <div className="h-10 flex items-center">
+        <div className="h-16 flex items-start justify-center pt-1">
           <AnimatePresence>
             {peeled && (
-              <motion.button
+              <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 8 }}
-                onClick={stickBack}
-                className="px-5 py-2 rounded-full bg-stone-800 text-stone-50 text-sm font-medium shadow-lg hover:bg-stone-700 transition-colors"
               >
-                Stick it back
-              </motion.button>
+                <ThreedButton
+                  threedVariant={NOTE_TO_BUTTON[color] ?? 'amber'}
+                  onClick={stickBack}
+                >
+                  Stick another one
+                </ThreedButton>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
