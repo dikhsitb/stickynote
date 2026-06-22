@@ -41,12 +41,16 @@ export default function App() {
     <div
       className="relative min-h-screen w-full flex flex-col items-center justify-center gap-6 sm:gap-10 p-4 sm:p-8 text-stone-700 overflow-hidden"
       style={{
-        backgroundColor: '#efece4',
-        // Diagonal micro pattern ("Gradient 3") across the entire page
-        backgroundImage:
-          'repeating-linear-gradient(315deg, var(--pattern-fg) 0, var(--pattern-fg) 1px, transparent 0, transparent 50%)',
-        backgroundSize: '10px 10px',
+        backgroundColor: '#f5f5f0',
+        // Ruled notebook paper: red margin line + horizontal rules
+        backgroundImage: [
+          'linear-gradient(to right, transparent 0 3.3rem, #e6acac 3.3rem calc(3.3rem + 1px), transparent calc(3.3rem + 1px))',
+          'linear-gradient(#f5f5f0 1.1rem, #ccc 1.2rem)',
+        ].join(', '),
+        backgroundSize: '100% 100%, 100% 1.2rem',
+        backgroundRepeat: 'no-repeat, repeat',
         backgroundAttachment: 'fixed',
+        border: '10px solid #fff',
       }}
     >
       <div className="flex flex-col items-center gap-4">
@@ -60,8 +64,8 @@ export default function App() {
           <div className="tape-section" aria-hidden="true" />
           <p>
             {isTouch
-              ? 'Tap to fold the corner and swipe to peel off the wall'
-              : 'Hover to lift the corner and click to peel off the wall'}
+              ? 'Tap to fold the corner and swipe to peel off the paper'
+              : 'Hover to lift the corner and click to peel off the paper'}
           </p>
           <div className="tape-section" aria-hidden="true" />
         </div>
