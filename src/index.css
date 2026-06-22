@@ -80,6 +80,7 @@
   font-size: 1.75rem;
   line-height: 1.15;
   color: #5a393f;
+  transform: rotate(2.5deg);
 }
 
 .taped-note p {
@@ -142,16 +143,10 @@
   left: -4vmin;
 }
 
-.taped-note .tape-section:first-of-type::after {
-  transform: rotate(45deg);
-  right: -4vmin;
-  top: 0;
-}
-
+/* top-right + bottom-left tapes removed; keep top-left + bottom-right */
+.taped-note .tape-section:first-of-type::after,
 .taped-note .tape-section:last-of-type::before {
-  transform: rotate(45deg);
-  left: -4vmin;
-  bottom: 0;
+  display: none;
 }
 
 .taped-note .tape-section:last-of-type::after {

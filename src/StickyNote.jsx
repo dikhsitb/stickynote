@@ -26,28 +26,30 @@ import { TOUCH_QUERY, useMediaQuery } from './useResponsive.js';
 const TAP_MAX = 12; // movement at or below this counts as a tap
 const SWIPE_MIN = 45; // movement at or above this counts as a swipe
 
-// Rounded square (resting state). Bottom-right corner is rounded.
+// Square sheet (resting state). Bottom-right corner is the fold corner.
+// Corners are sharp; arcs are kept (radius 0) so the command list still
+// matches PATH_FOLDED for a smooth morph.
 const PATH_FLAT = `
-  M 8 200
+  M 0 200
   L 100 200
-  L 192 200
-  C 195.3 200 200 195.3 200 192
+  L 200 200
+  C 200 200 200 200 200 192
   L 200 136
-  L 200 8 A 8 8 0 0 0 192 0
-  L 8 0 A 8 8 0 0 0 0 8
-  L 0 192 A 8 8 0 0 0 8 200 Z
+  L 200 0 A 0 0 0 0 0 200 0
+  L 0 0 A 0 0 0 0 0 0 0
+  L 0 200 A 0 0 0 0 0 0 200 Z
 `;
 
 // Same command list, but the bottom-right corner is sliced diagonally (folded).
 const PATH_FOLDED = `
-  M 8 200
+  M 0 200
   L 100 200
   L 144 200
   C 160 184 180 164 200 144
   L 200 136
-  L 200 8 A 8 8 0 0 0 192 0
-  L 8 0 A 8 8 0 0 0 0 8
-  L 0 192 A 8 8 0 0 0 8 200 Z
+  L 200 0 A 0 0 0 0 0 200 0
+  L 0 0 A 0 0 0 0 0 0 0
+  L 0 200 A 0 0 0 0 0 0 200 Z
 `;
 
 // The folded-over flap (back of the paper). Both states share an identical
@@ -60,8 +62,8 @@ const PATH_FOLDED = `
 // exactly how a corner looks when lifted to 90deg before flopping over.
 const PATH_EAR_FLAT = `
   M 144 200
-  L 188 200
-  Q 200 200 200 188
+  L 200 200
+  Q 200 200 200 200
   L 200 144
   C 180 164 160 184 144 200
   Z
@@ -69,8 +71,8 @@ const PATH_EAR_FLAT = `
 
 const PATH_EAR_FOLDED = `
   M 144 200
-  L 144 156
-  Q 144 144 156 144
+  L 144 144
+  Q 144 144 144 144
   L 200 144
   C 180 164 160 184 144 200
   Z
@@ -254,7 +256,6 @@ const StickyNote = ({
   };
 
   const gid = React.useId().replace(/:/g, '');
-  const radius = (8 / 200) * size;
 
   return (
     <div
@@ -281,9 +282,9 @@ const StickyNote = ({
         aria-hidden
         className="absolute inset-0"
         style={{
-          borderRadius: radius,
+          borderRadius: 0,
           background: 'rgba(40,30,10,0.45)',
-          filter: 'blur(14px)',
+          filter: 'blur(9px)',
           transformOrigin: 'center top',
           willChange: 'transform, opacity',
         }}
@@ -322,12 +323,20 @@ const StickyNote = ({
             </linearGradient>
           </defs>
 
-          {/* Main paper sheet */}
+          {/* Main paper sheet — crisp offset drop shadow mimics the taped note.
+              Only while flat: once the corner folds, a drop-shadow of the
+              diagonally-cut path would leak through the cut as a triangle. */}
           <motion.path
             fill={palette.bottom}
             variants={sheetVariants}
             initial="rest"
             animate={variant}
+            style={{
+              filter:
+                variant === 'rest'
+                  ? 'drop-shadow(2px 3px 2px rgba(40,30,10,0.28))'
+                  : 'none',
+            }}
           />
 
           {/* The folded-over flap (back of the paper). It unfolds from the

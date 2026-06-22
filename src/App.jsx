@@ -41,15 +41,20 @@ export default function App() {
     <div
       className="relative min-h-screen w-full flex flex-col items-center justify-center gap-6 sm:gap-10 p-4 sm:p-8 text-stone-700 overflow-hidden"
       style={{
-        backgroundColor: '#f5f5f0',
-        // Ruled notebook paper: red margin line + horizontal rules
+        backgroundColor: '#f1ece1',
+        // Ruled notebook paper over a subtle paper-grain texture.
+        // Layers (top -> bottom): red margin line, horizontal rules
+        // (transparent body so the texture shows through), grain photo.
         backgroundImage: [
           'linear-gradient(to right, transparent 0 3.3rem, #e6acac 3.3rem calc(3.3rem + 1px), transparent calc(3.3rem + 1px))',
-          'linear-gradient(#f5f5f0 1.1rem, #ccc 1.2rem)',
+          'linear-gradient(transparent 1.1rem, #cdc6b6 1.2rem)',
+          'url(/olga-thelavart-vS3idIiYxX0-unsplash.jpg)',
         ].join(', '),
-        backgroundSize: '100% 100%, 100% 1.2rem',
-        backgroundRepeat: 'no-repeat, repeat',
-        backgroundAttachment: 'fixed',
+        backgroundSize: '100% 100%, 100% 1.2rem, cover',
+        backgroundRepeat: 'no-repeat, repeat, no-repeat',
+        backgroundPosition: 'center top, left top, center',
+        backgroundBlendMode: 'normal, multiply, hard-light',
+        backgroundAttachment: 'fixed, fixed, fixed',
         border: '10px solid #fff',
       }}
     >
@@ -78,7 +83,7 @@ export default function App() {
       >
         {/* Adhesive residue / shadow left behind after peeling */}
         <div
-          className="absolute inset-0 rounded-lg"
+          className="absolute inset-0"
           style={{
             boxShadow: 'inset 0 0 22px rgba(90,65,35,0.12)',
             background: 'rgba(90,65,35,0.05)',
