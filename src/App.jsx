@@ -49,21 +49,22 @@ export default function App() {
         backgroundAttachment: 'fixed',
       }}
     >
-      <div className="text-center px-2">
+      <div className="flex flex-col items-center gap-4">
         <h1
-          className="text-4xl sm:text-5xl tracking-tight text-stone-800"
+          className="text-4xl sm:text-5xl uppercase tracking-tight text-stone-800"
           style={{ fontFamily: '"Tanker", sans-serif' }}
         >
           Sticky Note
         </h1>
-        <p
-          className="mt-3 text-sm sm:text-base text-stone-500"
-          style={{ fontFamily: '"Outfit", sans-serif' }}
-        >
-          {isTouch
-            ? 'Tap to fold the corner, swipe to peel it off the wall.'
-            : 'Hover to lift the corner, click to peel it off the wall.'}
-        </p>
+        <div className="taped-note">
+          <div className="tape-section" aria-hidden="true" />
+          <p>
+            {isTouch
+              ? 'Tap to fold the corner and swipe to peel off the wall'
+              : 'Hover to lift the corner and click to peel off the wall'}
+          </p>
+          <div className="tape-section" aria-hidden="true" />
+        </div>
       </div>
 
       {/* Stage: residue mark + the sticky note */}

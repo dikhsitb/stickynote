@@ -47,3 +47,115 @@
 .dark {
   --pattern-fg: rgba(255, 255, 255, 0.04);
 }
+
+/* Taped-corner paper note (used for the page header) */
+.taped-note {
+  --pink: #ecb2ba;
+  --pink-dark: #c6939a;
+  --tape-gray: #dbd8be;
+  --tape-edge-gray: #b7b49d;
+  --paper-color: var(--pink);
+  --paper-dark: var(--pink-dark);
+  --shadow-size: 1px;
+  --transparent: rgba(236, 178, 186, 0);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: min(360px, 88vw);
+  min-height: 110px;
+  padding: 24px 30px;
+  margin-top: 18px;
+  background: linear-gradient(
+      to bottom right,
+      var(--paper-dark),
+      20%,
+      var(--transparent)
+    ),
+    var(--paper-color);
+  box-shadow: var(--shadow-size) var(--shadow-size) 2px var(--paper-dark);
+  font-family: "Caveat", cursive;
+  font-size: 1.75rem;
+  line-height: 1.15;
+  color: #5a393f;
+}
+
+.taped-note p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.taped-note::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+      var(--transparent),
+      50%,
+      var(--paper-dark),
+      51%,
+      var(--transparent)
+    ),
+    linear-gradient(
+      to right,
+      var(--transparent),
+      50%,
+      var(--paper-dark),
+      51%,
+      var(--transparent)
+    );
+}
+
+.taped-note .tape-section {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  pointer-events: none;
+}
+
+.taped-note .tape-section:first-of-type {
+  top: 0;
+}
+
+.taped-note .tape-section:last-of-type {
+  bottom: 0;
+}
+
+.taped-note .tape-section::before,
+.taped-note .tape-section::after {
+  content: "";
+  position: absolute;
+  width: 10vmin;
+  height: 4vmin;
+  background-color: var(--tape-gray);
+  opacity: 0.5;
+  border-right: 1px dotted var(--tape-edge-gray);
+  border-left: 1px dotted var(--tape-edge-gray);
+}
+
+.taped-note .tape-section:first-of-type::before {
+  transform: rotate(-45deg);
+  left: -4vmin;
+}
+
+.taped-note .tape-section:first-of-type::after {
+  transform: rotate(45deg);
+  right: -4vmin;
+  top: 0;
+}
+
+.taped-note .tape-section:last-of-type::before {
+  transform: rotate(45deg);
+  left: -4vmin;
+  bottom: 0;
+}
+
+.taped-note .tape-section:last-of-type::after {
+  transform: rotate(-45deg);
+  right: -4vmin;
+  top: -3vmin;
+}
